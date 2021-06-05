@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/search_dev"
+        android:icon="@drawable/ic_baseline_bluetooth_24"
+        app:showAsAction="always"
+        android:title="@string/search_devices"/>
+    <item
+        android:id="@+id/connected_dev"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_bluetooth_connected_24"
+        android:title="@string/connect_devices"/>
+
+</menu>

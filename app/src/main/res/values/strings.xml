@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">eighth</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be > 5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="search_devices">search devices</string>
+    <string name="connect_devices">connect devices</string>
+    <string-array name="string_array">
+        <item>Cynthia</item>
+        <item>Stacy</item>
+        <item>Naks</item>
+        <item>Naks2</item>
+        <item>Eugine</item>
+        <item>JD</item>
+        <item>Wanga</item>
+        <item>Sharon</item>
+        <item>Tracy</item>
+        <item>Kemunto</item>
+        <item>Ivy</item>
+        <item>Juliet</item>
+        <item>Bilha</item>
+        <item>Lokho</item>
+        <item>Stacy</item>
+        <item>Lavender</item>
+        <item>Daniela</item>
+        <item>Judy</item>
+        <item>Achieng</item>
+        <item>Sylvia</item>
+        <item>Gloria</item>
+        <item>Victoria</item>
+        <item>Odinga</item>
+        <item>Mzungu</item>
+        <item>Wazungu</item>
+        <item>MRussia</item>
+        <item>American</item>
+        <item>French</item>
+        <item>Chinese</item>
+        <item>Korean</item>
+        <item>Black American</item>
+        <item>Lokho</item>
+        <item>Kasambuli</item>
+        <item>Latino</item>
+        <item>BWW</item>
+        <item>BBC</item>
+        <item>Money</item>
+        <item>Besha</item>
+        <item>Travel</item>
+        <item>Tache</item>
+        <item>Mami</item>
+    </string-array>
+</resources>
