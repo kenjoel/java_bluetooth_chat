@@ -23,6 +23,11 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kenjoel.chat_service.ChatUtil;
@@ -31,6 +36,13 @@ import com.kenjoel.eighth.R;
 public class MainChatActivity extends AppCompatActivity {
 
     private BluetoothAdapter bluetoothAdapter;
+
+    //CHAT UI
+    private ListView mListView;
+    private EditText mEditText;
+    private Button mSendButton;
+    private ArrayAdapter<String> adapterMainChat;
+
 
     //Chat Services
     private ChatUtil chatUtil;
@@ -91,12 +103,30 @@ public class MainChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_chat);
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        init();
+        initBluetooth();
         chatUtil = new ChatUtil(MainChatActivity.this, handler);
     }
 
-    private void init(){
+    private void initChat(){
+        mListView = findViewById(R.id.chat_list);
+        mEditText = findViewById(R.id.edit_text);
+        mSendButton = findViewById(R.id.mSendButton);
+        adapterMainChat = new ArrayAdapter<String>(MainChatActivity.this, R.layout.message_layout);
+        mListView.setAdapter(adapterMainChat);
+
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = mEditText.getText().toString();
+                if (!message.isEmpty()){
+
+                }
+            }
+        });
+    }
+
+    private void initBluetooth(){
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null){
             Toast.makeText(this, "No Devices Found", Toast.LENGTH_LONG).show();
         }else {

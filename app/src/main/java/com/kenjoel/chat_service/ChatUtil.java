@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.kenjoel.ui.MainChatActivity;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
 
@@ -246,6 +248,42 @@ public class ChatUtil {
         }
     }
 
+
+    private class ConnectedThread extends Thread{
+        private final BluetoothSocket mSocket;
+        private final InputStream mInputStream;
+        private final OutputStream mOutputStream;
+
+        public ConnectedThread(BluetoothSocket socket){
+            this.mSocket = socket;
+            InputStream star = null;
+            OutputStream neb = null;
+
+            try {
+                star = socket.getInputStream();
+                neb = socket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            mInputStream = star;
+            mOutputStream = neb;
+        }
+
+        public void run(){
+            byte[] buffer = new byte[1024];
+            int bytesLength;
+            try {
+                bytesLength = mInputStream.read(buffer);
+                handler.obtainMessage(MainChatActivity.MESSAGE_READ, bytesLength, -1,buffer).sendToTarget();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Issue Sending", e );
+            }
+
+        }
+
+    }
 }
 
 
