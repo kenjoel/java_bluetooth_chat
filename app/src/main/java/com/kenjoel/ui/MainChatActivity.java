@@ -78,6 +78,9 @@ public class MainChatActivity extends AppCompatActivity {
                     }
                     break;
                 case MESSAGE_READ:
+                    byte[] buffer = (byte[]) msg.obj;
+                    String inputBuffer = new String(buffer, 0, msg.arg1);
+                    adapterMainChat.add(connectedDevices + " " + inputBuffer);
                     break;
                 case  MESSAGE_WRITE:
                     System.out.println("Didn't find any connections");

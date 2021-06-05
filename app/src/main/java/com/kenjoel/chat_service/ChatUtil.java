@@ -277,6 +277,7 @@ public class ChatUtil {
                 bytesLength = mInputStream.read(buffer);
                 handler.obtainMessage(MainChatActivity.MESSAGE_READ, bytesLength, -1,buffer).sendToTarget();
             } catch (IOException e) {
+                connectionLost();
                 e.printStackTrace();
                 Log.e(TAG, "Issue Sending", e );
             }
@@ -284,6 +285,18 @@ public class ChatUtil {
         }
 
     }
+
+    private void connectionLost() {
+        Message message = handler.obtainMessage(MainChatActivity.MESSAGE_TOAST);
+        Bundle bundle = new Bundle();
+        bundle.putString(MainChatActivity.TOAST, "Connection Lost");
+        message.setData(bundle);
+        handler.sendMessage(message);
+
+        ChatUtil.this.start();
+    }
+
+
 }
 
 
