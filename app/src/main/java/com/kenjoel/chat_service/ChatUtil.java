@@ -281,7 +281,15 @@ public class ChatUtil {
                 e.printStackTrace();
                 Log.e(TAG, "Issue Sending", e );
             }
+        }
 
+        public void write(byte[] buffer){
+            try {
+                mOutputStream.write(buffer);
+                handler.obtainMessage(MainChatActivity.MESSAGE_WRITE, -1, -1,buffer).sendToTarget();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
