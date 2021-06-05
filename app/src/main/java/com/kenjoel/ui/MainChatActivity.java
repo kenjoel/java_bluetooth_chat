@@ -83,7 +83,9 @@ public class MainChatActivity extends AppCompatActivity {
                     adapterMainChat.add(connectedDevices + " " + inputBuffer);
                     break;
                 case  MESSAGE_WRITE:
-                    System.out.println("Didn't find any connections");
+                    byte[] bytes =  (byte[]) msg.obj;
+                    String outputBuffer = new String(bytes);
+                    adapterMainChat.add("Me" + outputBuffer);
                     break;
                 case  MESSAGE_DEVICE_NAME:
                     connectedDevices = msg.getData().getString(DeviceNAme);
@@ -122,7 +124,8 @@ public class MainChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String message = mEditText.getText().toString();
                 if (!message.isEmpty()){
-
+                    mEditText.setText("");
+                    chatUtil.beginChat(message.getBytes());
                 }
             }
         });

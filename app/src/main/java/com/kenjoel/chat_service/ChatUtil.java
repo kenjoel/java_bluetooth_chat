@@ -26,6 +26,7 @@ public class ChatUtil {
 
     private ConnectThread connectThread;
     private HandleAcceptedDevices handleAcceptedDevices;
+    private ConnectedThread connectedThread;
 
     private String TAG = "ChatUtil";
     private BluetoothAdapter bluetoothAdapter;
@@ -69,6 +70,12 @@ public class ChatUtil {
             handleAcceptedDevices.start();
 
             setState(STATE_LISTEN);
+        }
+
+
+        if (connectThread != null){
+            connectThread.cancel();
+            connectThread = null;
         }
     }
 
@@ -178,11 +185,19 @@ public class ChatUtil {
 
 
 
-    public synchronized void connected(BluetoothDevice device){
+    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device){
         if (connectThread != null){
             connectThread.cancel();
             connectThread = null;
         }
+
+        if (connectThread != null){
+            connectThread.cancel();
+            connectThread = null;
+        }
+
+        ConnectedThread connectedThread = new ConnectedThread(socket);
+        connectedThread.start();
 
         Message message = handler.obtainMessage(MainChatActivity.MESSAGE_DEVICE_NAME);
         Bundle bundle = new Bundle();
@@ -292,6 +307,15 @@ public class ChatUtil {
             }
         }
 
+        public void cancel(){
+            try{
+                mSocket.close();
+            }catch (IOException e){
+                Log.e(TAG, "cancel: " + e.toString() );
+
+            }
+        }
+
     }
 
     private void connectionLost() {
@@ -302,6 +326,18 @@ public class ChatUtil {
         handler.sendMessage(message);
 
         ChatUtil.this.start();
+    }
+
+
+    public void beginChat(byte[] buffer){
+        ConnectedThread conThread;
+        synchronized (this){
+            if (state != STATE_CONNECTED){
+                return;
+            }
+            conThread = connectedThread;
+        }
+        conThread.write(buffer);
     }
 
 
