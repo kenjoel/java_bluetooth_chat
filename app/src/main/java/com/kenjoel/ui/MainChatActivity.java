@@ -1,5 +1,9 @@
 package com.kenjoel.ui;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -50,8 +55,6 @@ public class MainChatActivity extends AppCompatActivity {
         public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what){
                 case MESSAGE_STATE_CHANGED:
-                    break;
-                case MESSAGE_READ:
                     switch (msg.arg1){
                         case ChatUtil
                                 .STATE_HOME:
@@ -61,19 +64,25 @@ public class MainChatActivity extends AppCompatActivity {
                         case ChatUtil.STATE_CONNECTING:
                             setState("Connecting...");
                         case ChatUtil.STATE_CONNECTED:
-                            setState("Connected" + DeviceNAme);
+                            setState("Connected" + connectedDevices);
                     }
+                    break;
+                case MESSAGE_READ:
+                    break;
                 case  MESSAGE_WRITE:
+                    System.out.println("Didn't find any connections");
                     break;
                 case  MESSAGE_DEVICE_NAME:
                     connectedDevices = msg.getData().getString(DeviceNAme);
                     Toast.makeText(MainChatActivity.this, connectedDevices, Toast.LENGTH_LONG).show();
                 case MESSAGE_TOAST:
                     Toast.makeText(MainChatActivity.this, msg.getData().getString(TOAST), Toast.LENGTH_LONG).show();
+                    break;
             }
             return false;
         }
     });
+
 
     private void setState(CharSequence subTitle){
         getSupportActionBar().setSubtitle(subTitle);
@@ -117,6 +126,20 @@ public class MainChatActivity extends AppCompatActivity {
     }
 
 
+    ActivityResultLauncher<Intent> requestForPermissions = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == Activity.RESULT_OK){
+
+                assert result.getData() != null;
+                String address = result.getData().getStringExtra("itsAddress");
+                Log.d("TAG", "onActivityResult: " + address);
+    //            chatUtil.connect();
+                Toast.makeText(MainChatActivity.this, "Address" + address, Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    });
 
     private void blueToothEnabled(){
         if(!bluetoothAdapter.isEnabled()){
@@ -131,53 +154,7 @@ public class MainChatActivity extends AppCompatActivity {
     }
 
 
-    private void checkPermissions(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainChatActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_FINE_PERMISSIONS);
-        }else{
-            Intent intent = new Intent(this, ListActivity.class);
-            startActivityForResult(intent, CLICK_TO_START_CHAT);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        if (requestCode == LOCATION_FINE_PERMISSIONS){
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                Intent intent = new Intent(MainChatActivity.this, ListActivity.class);
-                startActivityForResult(intent, CLICK_TO_START_CHAT  );
-            }else{
-                new AlertDialog.Builder(this)
-                        .setCancelable(false)
-                        .setMessage("Location Permission is required, por favor grant them")
-                        .setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                checkPermissions();
-                            }
-                        })
-                        .setNegativeButton("Denied", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                MainChatActivity.this.finish();
-                            }
-                        }).show();
-            }
-        }else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == CLICK_TO_START_CHAT && resultCode == RESULT_OK){
-            String address = getIntent().getStringExtra("deviceAddress");
-//            chatUtil.connect();
-            Toast.makeText(this, "Address" + address, Toast.LENGTH_SHORT).show();
-        }
+    private void checkPermissions() {
+        requestForPermissions.launch(new Intent(MainChatActivity.this, ListActivity.class));
     }
 }

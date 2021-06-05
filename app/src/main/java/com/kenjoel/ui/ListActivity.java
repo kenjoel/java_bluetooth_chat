@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,7 @@ public class ListActivity extends AppCompatActivity {
 
 
     private ListView paired_devices;
+    private String TAG = "What I want";
 
     private ListView available_devices;
 
@@ -66,9 +68,10 @@ public class ListActivity extends AppCompatActivity {
 
                 String clicked_device = ((TextView) view).getText().toString();
                 String address = clicked_device.substring(clicked_device.length() - 17);
+                Toast.makeText(ListActivity.this, "The device name" + clicked_device + "\n" + address, Toast.LENGTH_LONG).show();
 
                 Intent intent = new Intent();
-                intent.putExtra("deviceAddress", address);
+                intent.putExtra("itsAddress", address);
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -115,6 +118,7 @@ public class ListActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            System.out.println(action);
 
             if (BluetoothDevice.ACTION_FOUND.equals(action)){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -128,7 +132,7 @@ public class ListActivity extends AppCompatActivity {
                 if (adapter_available.getCount() == 0){
                     Toast.makeText(ListActivity.this, "No new devices found", Toast.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(ListActivity.this, "Hey, You wanna chat? click on anyone and begin chart", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ListActivity.this, "Hey, You wanna chat? click on anyone and begin chat", Toast.LENGTH_SHORT).show();
                 }
             }
         }

@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ChatUtil {
     private Context context;
     private Handler handler;
-
+    private ConnectThread connectThread;
     private String TAG = "ChatUtil";
 
     public static final int STATE_HOME = 0;
@@ -57,7 +57,6 @@ public class ChatUtil {
         private final BluetoothSocket bluetoothSocket;
         private final BluetoothDevice device;
 
-        private ConnectThread connectThread;
 
         public ConnectThread(BluetoothDevice bluetoothDevice){
             this.device = bluetoothDevice;
@@ -82,9 +81,11 @@ public class ChatUtil {
             try{
                 bluetoothSocket.connect();
             } catch (IOException e) {
+                Log.d(TAG, "connection -> run: " + e);
                 try {
                     bluetoothSocket.close();
                 } catch (IOException ioException) {
+                    Log.d(TAG, "Bluetooth close" + ioException);
                     ioException.printStackTrace();
                 }
                 connection_failed();
@@ -138,24 +139,26 @@ public class ChatUtil {
             ChatUtil.this.start();
         }
 
-//    public void connect(BluetoothDevice device){
-//        if (state == STATE_CONNECTING){
-//            try{
-//                bluetoothSocket.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            connectThread = null;
-//        }
-//
-//        connectThread = new ConnectThread(device);
-//        connectThread.start();
-//
-//        setState(STATE_CONNECTING);
-//
-//    }
-//
+
+    public synchronized void connect(BluetoothDevice device){
+        if (connectThread == )
+        if (state == STATE_CONNECTING){
+            try{
+                bluetoothSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            connectThread = null;
+        }
+
+        connectThread = new ConnectThread(device);
+        connectThread.start();
+
+        setState(STATE_CONNECTING);
+
+    }
+
 
 }
 
