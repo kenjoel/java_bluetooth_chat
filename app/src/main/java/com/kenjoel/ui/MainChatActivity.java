@@ -95,7 +95,7 @@ public class MainChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_chat);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         init();
-        chatUtil = new ChatUtil(this, handler);
+        chatUtil = new ChatUtil(MainChatActivity.this, handler);
     }
 
     private void init(){
@@ -134,7 +134,7 @@ public class MainChatActivity extends AppCompatActivity {
                 assert result.getData() != null;
                 String address = result.getData().getStringExtra("itsAddress");
                 Log.d("TAG", "onActivityResult: " + address);
-    //            chatUtil.connect();
+                chatUtil.connect(bluetoothAdapter.getRemoteDevice(address));
                 Toast.makeText(MainChatActivity.this, "Address" + address, Toast.LENGTH_SHORT).show();
 
             }

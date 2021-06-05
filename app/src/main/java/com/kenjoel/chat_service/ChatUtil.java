@@ -78,7 +78,7 @@ public class ChatUtil {
         public void run() {
             super.run();
 
-            try{
+            try {
                 bluetoothSocket.connect();
             } catch (IOException e) {
                 Log.d(TAG, "connection -> run: " + e);
@@ -92,63 +92,28 @@ public class ChatUtil {
                 return;
             }
 
-            synchronized (ChatUtil.this){
+            synchronized (ChatUtil.this) {
                 connectThread = null;
             }
 
-            connected(device);
+            connect(device);
         }
+        public void cancel(){
+            try{
+                bluetoothSocket.close();
+            }catch (IOException e){
+                Log.e(TAG, "cancel: " + e.toString() );
 
-
-
-
-        private synchronized void connected(BluetoothDevice device) {
-            if (connectThread != null){
-                try {
-                    bluetoothSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                connectThread = null;
             }
-
-            Message message = handler.obtainMessage(MainChatActivity.MESSAGE_DEVICE_NAME);
-            Bundle bundle = new Bundle();
-            bundle.putString(MainChatActivity.DeviceNAme, device.getName());
-            message.setData(bundle);
-            handler.sendMessage(message);
-
-            setState(ChatUtil.STATE_CONNECTED);
-
         }
     }
 
 
-        private synchronized void connection_failed(){
-            Message message = handler.obtainMessage(MainChatActivity.MESSAGE_TOAST);
-
-            Bundle bundle = new Bundle();
-
-            bundle.putString(MainChatActivity.TOAST, "Can't connect to device");
-
-            message.setData(bundle);
-
-            handler.sendMessage(message);
-
-            ChatUtil.this.start();
-        }
 
 
-    public synchronized void connect(BluetoothDevice device){
-        if (connectThread == )
+        public synchronized void connect(BluetoothDevice device) {
         if (state == STATE_CONNECTING){
-            try{
-                bluetoothSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            connectThread.cancel();
             connectThread = null;
         }
 
@@ -156,6 +121,40 @@ public class ChatUtil {
         connectThread.start();
 
         setState(STATE_CONNECTING);
+
+        }
+
+
+    private synchronized void connection_failed(){
+        Message message = handler.obtainMessage(MainChatActivity.MESSAGE_TOAST);
+
+        Bundle bundle = new Bundle();
+
+        bundle.putString(MainChatActivity.TOAST, "Can't connect to device");
+
+        message.setData(bundle);
+
+        handler.sendMessage(message);
+
+        ChatUtil.this.start();
+    }
+
+
+
+
+    public synchronized void connected(BluetoothDevice device){
+        if (connectThread != null){
+            connectThread.cancel();
+            connectThread = null;
+        }
+
+        Message message = handler.obtainMessage(MainChatActivity.MESSAGE_DEVICE_NAME);
+        Bundle bundle = new Bundle();
+        bundle.putString(MainChatActivity.DeviceNAme, device.getName());
+        message.setData(bundle);
+        handler.sendMessage(message);
+
+        setState(STATE_CONNECTED);
 
     }
 
