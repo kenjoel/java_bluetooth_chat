@@ -1,6 +1,8 @@
 package com.kenjoel.chat_service;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.os.Bundle;
@@ -19,8 +21,14 @@ import java.util.UUID;
 public class ChatUtil {
     private Context context;
     private Handler handler;
+
     private ConnectThread connectThread;
+    private HandleAcceptedDevices handleAcceptedDevices;
+
     private String TAG = "ChatUtil";
+    private BluetoothAdapter bluetoothAdapter;
+
+    private final String APP_NAME = "BluetoothAppName";
 
     public static final int STATE_HOME = 0;
     public static final int STATE_LISTEN = 1;
@@ -34,6 +42,7 @@ public class ChatUtil {
         this.context = context;
         this.handler = handler;
 
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         state = STATE_HOME;
     }
 
@@ -47,9 +56,34 @@ public class ChatUtil {
     }
 
 
-    private synchronized void start(){}
+    private synchronized void start(){
+        if (connectThread != null){
+            connectThread.cancel();
+            connectThread = null;
+        }
 
-    private synchronized void stop(){}
+        if (handleAcceptedDevices == null){
+            handleAcceptedDevices = new HandleAcceptedDevices();
+            handleAcceptedDevices.start();
+
+            setState(STATE_LISTEN);
+        }
+    }
+
+    public synchronized void stop(){
+        if (connectThread != null){
+            connectThread.cancel();
+            connectThread = null;
+        }
+
+        if (handleAcceptedDevices != null){
+            handleAcceptedDevices = new HandleAcceptedDevices();
+            handleAcceptedDevices.cancel();
+            handleAcceptedDevices = null;
+        }
+
+        setState(STATE_HOME);
+    }
 
 
 
@@ -158,6 +192,59 @@ public class ChatUtil {
 
     }
 
+    private class HandleAcceptedDevices extends Thread{
+        private BluetoothServerSocket bluetoothServerSocket;
+
+        public HandleAcceptedDevices(){
+            BluetoothServerSocket tmp = null;
+            try{
+                tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(APP_NAME, uuid);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "HandleAcceptedDevices: ", e);
+            }
+           bluetoothServerSocket = tmp;
+        }
+
+        public void run(){
+            BluetoothSocket socket = null;
+            try{
+                bluetoothServerSocket.accept();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Socket connection: ",e );
+                try{
+                    socket.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    Log.e(TAG, "Close Socket Connection: ", e );
+                }
+            }
+            if (socket != null){
+                switch (state){
+                    case STATE_LISTEN:
+                    case STATE_CONNECTING:
+                        connect(socket.getRemoteDevice());
+                        break;
+                    case STATE_CONNECTED:
+                        try{
+                            socket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        }
+        public void cancel(){
+            try{
+                bluetoothServerSocket.close();
+            }catch (IOException e){
+                Log.e(TAG, "cancel: " + e.toString() );
+
+            }
+        }
+    }
 
 }
 

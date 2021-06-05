@@ -31,8 +31,6 @@ import com.kenjoel.eighth.R;
 public class MainChatActivity extends AppCompatActivity {
 
     private BluetoothAdapter bluetoothAdapter;
-    private final int LOCATION_FINE_PERMISSIONS = 101;
-    private final int CLICK_TO_START_CHAT = 102;
 
     //Chat Services
     private ChatUtil chatUtil;
@@ -156,5 +154,13 @@ public class MainChatActivity extends AppCompatActivity {
 
     private void checkPermissions() {
         requestForPermissions.launch(new Intent(MainChatActivity.this, ListActivity.class));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (chatUtil != null){
+            chatUtil.stop();
+        }
     }
 }
